@@ -2,8 +2,23 @@ pub mod model;
 
 use model::game_of_life::GameOfLife;
 
-fn main() {
-    let  gol = GameOfLife::new();
+use clearscreen;
 
-     println!("{gol}");
+
+
+
+
+fn main() {
+    let mut gol = GameOfLife::new();
+    
+
+    loop{
+        gol.randomize(Some(10), Some(5));
+        clearscreen::clear().expect("failed to clear screen");
+        println!("{gol}");
+        gol.step();
+        gol.step_delay(2);
+      
+    }
+    
 }
