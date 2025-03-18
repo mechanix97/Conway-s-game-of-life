@@ -137,7 +137,7 @@ impl GameOfLife{
 impl fmt::Display for GameOfLife {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         
-        write!(f, "{}\n\nSTEP: {}\tALIVE CELLS: {}",self.data_as_str(-1,100,-1,100), self.step, self.count_alive_cells())
+        write!(f, "{}\n\nSTEP: {}\tALIVE CELLS: {}",self.data_as_str(1,3,1,3), self.step, self.count_alive_cells())
     }
 }
 
@@ -164,5 +164,66 @@ mod test{
         gol.add_alive_cell(0, -1);  
         gol.add_alive_cell(1, -1); 
         assert_eq!(gol.count_alive_neighbours(0, 0), 8);
+    }
+
+
+    #[test]
+    fn test_rule1(){
+        let mut gol = GameOfLife::new();
+        gol.add_alive_cell(0, 0);
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬜⬛\n⬛⬛⬛\n");
+        gol.step();
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬛⬛\n⬛⬛⬛\n");
+        gol.add_alive_cell(0, 0);
+        gol.add_alive_cell(0, 1);
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬜⬜\n⬛⬛⬛\n");
+        gol.step();
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬛⬛\n⬛⬛⬛\n");
+    }
+
+
+    #[test]
+    fn test_rule2() {
+        let mut gol = GameOfLife::new();
+
+        gol.add_alive_cell(0, 0);
+        gol.add_alive_cell(0, 1);
+        gol.add_alive_cell(0, -1);
+
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬜⬜⬜\n⬛⬛⬛\n");
+
+        gol.step();
+        // the cell in the center is still alive
+        assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬜⬛\n⬛⬜⬛\n⬛⬜⬛\n");
+    }
+
+    #[test]
+    fn test_rule3(){
+        let mut gol = GameOfLife::new();
+        gol.add_alive_cell(2, 2);
+        gol.add_alive_cell(1, 2);
+        gol.add_alive_cell(2, 1);
+        gol.add_alive_cell(3, 2);
+        gol.add_alive_cell(2, 3);
+        assert_eq!(gol.data_as_str(1,3,1,3), "⬛⬜⬛\n⬜⬜⬜\n⬛⬜⬛\n");
+        
+        gol.step();
+        // the center cell dies
+        assert_eq!(gol.data_as_str(1,3,1,3), "⬜⬜⬜\n⬜⬛⬜\n⬜⬜⬜\n");      
+    }
+
+    #[test]
+    fn test_rule4(){
+        let mut gol = GameOfLife::new();
+        gol.add_alive_cell(1, 1);
+        gol.add_alive_cell(1, 2);
+        gol.add_alive_cell(2, 1);
+
+
+        assert_eq!(gol.data_as_str(1,2,1,2), "⬜⬛\n⬜⬜\n");
+        
+        gol.step();
+        // a new cell lives
+        assert_eq!(gol.data_as_str(1,2,1,2), "⬜⬜\n⬜⬜\n");       
     }
 }
