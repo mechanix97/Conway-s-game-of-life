@@ -10,9 +10,8 @@ use clearscreen;
 
 fn main() {
     let mut gol = GameOfLife::new();
-
-    loop{
-        gol.randomize(None, None);
+    gol.randomize(None, None);
+    loop{ 
         clearscreen::clear().expect("failed to clear screen");
         println!("{gol}");
         gol.step();
