@@ -13,11 +13,11 @@ fn main() {
     
 
     loop{
-        gol.randomize(Some(10), Some(5));
+        gol.randomize(None, None);
         clearscreen::clear().expect("failed to clear screen");
         println!("{gol}");
         gol.step();
-        gol.step_delay(2);
+        gol.step_delay(500);
       
     }
     
