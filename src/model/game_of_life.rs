@@ -32,11 +32,15 @@ impl GameOfLife{
         }
     }
 
+    pub fn add_alive_cell(&mut self, pos_x: i32, pos_y: i32){
+        self.alive_cells.insert((pos_x, pos_y));
+    }
+
     pub fn step(&mut self){
         self.step += 1;
     }
 
-    fn count_alive_neighbours(&self, pos_x: i32, pos_y: i32) -> u32{
+    pub fn count_alive_neighbours(&self, pos_x: i32, pos_y: i32) -> u32{
         let mut count = 0;
         for i in [-1,0,1]{
             for j in [-1,0,1]{
@@ -73,15 +77,17 @@ impl GameOfLife{
         let mut data_as_str: String = String::new();
 
         // Calculate screen size from input
-        let width = (max_x - min_x).try_into().unwrap();
-        let height = (max_y - min_y).try_into().unwrap();
+        let width = (max_x - min_x + 1).try_into().unwrap();
+        let height = (max_y - min_y + 1).try_into().unwrap();
+
         let mut output: Vec<Vec<char>>   = vec!(vec! ('⬛'; width); height);
 
         // Filter only the cell in the region to draw
         for (x,y) in self.alive_cells.iter().filter(|(a,b)|{
             *a>=min_x && *a<=max_x &&
             *b>=min_y && *b<=max_y}) {
-                let pos_x: usize = (x - min_x).try_into().unwrap();
+                // rotate for better diplay
+                let pos_x: usize = (max_x - x).try_into().unwrap();
                 let pos_y: usize = (y - min_y).try_into().unwrap();
                 output[pos_x][pos_y] = '⬜';
         }
@@ -98,5 +104,31 @@ impl fmt::Display for GameOfLife {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         
         write!(f, "{}\n\nSTEP: {}\tALIVE CELLS: {}",self.data_as_str(-1,31,-1,31), self.step, self.count_alive_cells())
+    }
+}
+
+
+#[cfg(test)]
+mod test{
+    use super::*;
+
+    #[test]
+    fn check_count_alive_neighbours(){
+        let mut gol = GameOfLife::new();
+        assert_eq!(gol.count_alive_neighbours(0, 0), 0);
+        gol.add_alive_cell(0, 0);
+        assert_eq!(gol.count_alive_neighbours(0, 0), 0);
+        gol.add_alive_cell(1, 0);
+        assert_eq!(gol.count_alive_neighbours(0, 0), 1);
+        gol.add_alive_cell(2, 0);
+        assert_eq!(gol.count_alive_neighbours(0, 0), 1);
+        gol.add_alive_cell(1, 1);
+        gol.add_alive_cell(0, 1);
+        gol.add_alive_cell(-1, 1);
+        gol.add_alive_cell(-1, 0);
+        gol.add_alive_cell(-1, -1);
+        gol.add_alive_cell(0, -1);  
+        gol.add_alive_cell(1, -1); 
+        assert_eq!(gol.count_alive_neighbours(0, 0), 8);
     }
 }

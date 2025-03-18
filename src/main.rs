@@ -10,7 +10,6 @@ use clearscreen;
 
 fn main() {
     let mut gol = GameOfLife::new();
-    
 
     loop{
         gol.randomize(None, None);
