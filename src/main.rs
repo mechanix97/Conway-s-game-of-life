@@ -1,15 +1,15 @@
 pub mod model;
 pub mod view;
 
-use model::game_of_life::{self, GameOfLife};
+use model::game_of_life::GameOfLife;
 use view::screen::Screen;
 
 #[macroquad::main("Conway's game of life")]
 async fn main() {
     let mut screen = Screen::new();
-    screen.set_area(0, 0, 30, 30);
+    screen.set_area(-10, -10,110 , 110);
     let mut gol = GameOfLife::new();
-    gol.randomize(Some(30), Some(30));
+    gol.randomize(Some(100), Some(100));
 
     loop {
         let _ = screen.check_buttons();

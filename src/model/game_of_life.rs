@@ -91,7 +91,7 @@ impl GameOfLife {
         ]
     }
 
-    pub fn step_delay(&mut self, msecs: u64) {
+    pub fn step_delay(&self, msecs: u64) {
         thread::sleep(time::Duration::from_millis(msecs));
     }
 
