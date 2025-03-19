@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use macroquad::prelude::*;
 
 //pos* indicates the area of the simulation to show in the screen
@@ -20,28 +22,26 @@ impl Screen {
     }
 
     // receives a matrix of bools indicating the state of the cells
-    pub async fn draw_frame(&mut self, gol_data: Vec<Vec<bool>>) {
+    pub async fn draw_frame(&mut self, gol_data: HashSet<(i32,i32)>) {
         clear_background(WHITE);
 
-        let cell_heigth: f32 = screen_height() / (gol_data.len() as f32);
-        let cell_width: f32 = screen_width() / (gol_data[0].len() as f32);
+        let rows = self.posy_max.abs() - self.posy_min;
+        let cols = self.posx_max.abs() - self.posx_min; 
 
-        for iu in 0..gol_data.len() {
-            for ju in 0..gol_data[0].len() {
-                let color = match gol_data[iu][ju] {
-                    true => BLACK,
-                    false => WHITE
-                };
-                let i: f32 = iu as f32;
-                let j: f32 = ju as f32;
+        let cell_heigth: f32 = screen_height() / (rows as f32);
+        let cell_width: f32 = screen_width() / (cols as f32);
 
-                draw_rectangle(
-                    j * cell_width,
-                    i * cell_heigth,
-                    (j + 1.0) * cell_width,
-                    (i + 1.0) * cell_heigth,
-                    color,
-                );
+        for i in 0..rows {
+            for j in 0..cols {
+                if gol_data.contains(&(i,j)) {
+                    draw_rectangle(
+                        (j as f32) * cell_width,
+                        (i as f32) * cell_heigth,
+                        cell_width,
+                        cell_heigth,
+                        BLACK,
+                    );
+                }  
             }
         }
         next_frame().await
