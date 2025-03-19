@@ -1,5 +1,8 @@
 use macroquad::prelude::*;
 
+
+//pos* indicates the area of the simulation to show in the screen
+
 pub struct Screen {
     posx_min: i64,
     posx_max: i64,
@@ -17,6 +20,9 @@ impl Screen {
         }
     }
 
+    // receives a matrix of chars indicating the state of the cells
+    // 1 = alive
+    // 2 = dead
     pub async fn draw_frame(&mut self, gol_data: Vec<Vec<char>>) {
         clear_background(WHITE);
 
@@ -45,6 +51,9 @@ impl Screen {
         next_frame().await
     }
 
+
+    // check if a button has been pressed
+    // for arrows, move the view by 10% in a given direction
     pub fn check_buttons(&mut self) -> bool {
         let mut refresh = false;
         if is_key_down(KeyCode::Down) {
