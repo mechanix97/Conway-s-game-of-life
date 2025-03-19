@@ -21,8 +21,8 @@ impl Screen {
     pub async fn draw_frame(&mut self, gol_data: Vec<Vec<char>>){
         clear_background(WHITE);
 
-        let cell_width: f32 = screen_width()/(gol_data.len() as f32);
-        let cell_heigth: f32 = screen_height()/(gol_data[0].len() as f32);  
+        let cell_heigth: f32 = screen_height()/(gol_data.len() as f32);
+        let cell_width:  f32 = screen_width()/(gol_data[0].len() as f32);  
 
         for iu in 0..gol_data.len(){
             for ju in 0..gol_data[0].len(){
@@ -33,8 +33,10 @@ impl Screen {
                 };
                 let i: f32 = iu as f32;
                 let j: f32 = ju as f32;
-                println!("{} {} {} {}", i*cell_width, j*cell_heigth, (i+1.0)*cell_width, (j+1.0)*cell_heigth );
-                draw_rectangle(i*cell_width, j*cell_heigth, (i+1.0)*cell_width, (j+1.0)*cell_heigth, color);        
+
+                draw_rectangle(j*cell_width, i*cell_heigth, 
+                    (j+1.0)*cell_width, (i+1.0)*cell_heigth,
+                     color);        
             }
         }
 
