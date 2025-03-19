@@ -2,6 +2,9 @@
 
 My implementation of Conway's game of life.
 
+![Conway's game of life](conways.gif)
+
+
 ## Rules
 
 - Any live cell with fewer than two live neighbours dies, as if by underpopulation.

@@ -1,35 +1,21 @@
 pub mod model;
+pub mod view;
 
-use model::game_of_life::GameOfLife;
+use model::game_of_life::{self, GameOfLife};
+use view::screen::Screen;
 
-use clearscreen;
-
-
-
-
-
-fn main() {
+#[macroquad::main("Conway's game of life")]
+async fn main() {
+    let mut screen = Screen::new();
+    screen.set_area(0, 0, 30, 30);
     let mut gol = GameOfLife::new();
-    // gol.randomize(None, None);
+    gol.randomize(Some(30), Some(30));
 
-    gol.add_alive_cell(2, 2);
-    gol.add_alive_cell(1, 2);
-    gol.add_alive_cell(2, 1);
-    gol.add_alive_cell(3, 2);
-    gol.add_alive_cell(2, 3);
-
-
-    println!("{gol}");
+    loop {
+        let _ = screen.check_buttons();
+        let area = screen.get_area();
+        screen.draw_frame(gol.data_as_vec(area)).await;
         gol.step();
-
-        println!("{gol}");
-
-    // loop{ 
-    //     clearscreen::clear().expect("failed to clear screen");
-    //     println!("{gol}");
-    //     gol.step();
-    //     gol.step_delay(500);
-      
-    // }
-    
+        gol.step_delay(100);
+    }
 }
