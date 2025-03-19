@@ -21,14 +21,14 @@ impl Screen {
         }
     }
 
-    // receives a matrix of bools indicating the state of the cells
+    // receives a hashset indicating the cords of the alive cells
     pub async fn draw_frame(&mut self, gol_data: HashSet<(i32,i32)>) {
         clear_background(WHITE);
 
         let rows = self.posy_max.abs() - self.posy_min;
         let cols = self.posx_max.abs() - self.posx_min; 
 
-        let cell_heigth: f32 = screen_height() / (rows as f32);
+        let cell_heigth: f32 = (screen_height() - 30.0)/ (rows as f32);
         let cell_width: f32 = screen_width() / (cols as f32);
 
         for i in 0..rows {
@@ -44,7 +44,20 @@ impl Screen {
                 }  
             }
         }
+        self.draw_footer();
         next_frame().await
+    }
+
+
+    pub fn draw_footer(&self) {
+        draw_rectangle(
+            0.0,
+            screen_height() - 30.0,
+            screen_width(),
+            30.0,
+            GRAY,
+        );
+        draw_text(format!("STEP: {}     CELLS ALIVE: {}", 5, 12).as_str(), 5.0 ,screen_height() - 7.0 , 25.0, BLACK);
     }
 
     // check if a button has been pressed

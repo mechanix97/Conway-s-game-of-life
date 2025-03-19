@@ -13,15 +13,15 @@ use view::screen::Screen;
 #[macroquad::main("Conway's game of life")]
 async fn main() {
     let mut screen = Screen::new();
-    screen.set_area(-10, -10,110 , 110);
-    let mut gol = Arc::new(RwLock::new(GameOfLife::new()));
-    gol.write().unwrap().randomize(Some(100), Some(100));
+    screen.set_area(-10, -10,40 , 40);
+    let gol = Arc::new(RwLock::new(GameOfLife::new()));
+    gol.write().unwrap().randomize(Some(30), Some(30));
 
 
     let mut running = true;
 
-    let mut gol_clone = gol.clone();
-    let mut join = thread::spawn(move || {
+    let gol_clone = gol.clone();
+    let join = thread::spawn(move || {
        while running{
             {gol_clone.write().unwrap().step();}
             gol_clone.read().unwrap().step_delay(100);
@@ -37,4 +37,5 @@ async fn main() {
     }
 
     running = false;
+    let _ = join.join();
 }
