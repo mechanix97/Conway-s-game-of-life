@@ -1,4 +1,6 @@
 pub mod view;
+pub mod model;
+
 use view::screen::Screen;
 
 #[macroquad::main("Conway's game of life")]
