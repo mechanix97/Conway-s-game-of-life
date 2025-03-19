@@ -1,13 +1,12 @@
 use macroquad::prelude::*;
 
-
 //pos* indicates the area of the simulation to show in the screen
 
 pub struct Screen {
-    posx_min: i64,
-    posx_max: i64,
-    posy_min: i64,
-    posy_max: i64,
+    posx_min: i32,
+    posy_min: i32,
+    posx_max: i32,
+    posy_max: i32,
 }
 
 impl Screen {
@@ -20,10 +19,8 @@ impl Screen {
         }
     }
 
-    // receives a matrix of chars indicating the state of the cells
-    // 1 = alive
-    // 2 = dead
-    pub async fn draw_frame(&mut self, gol_data: Vec<Vec<char>>) {
+    // receives a matrix of bools indicating the state of the cells
+    pub async fn draw_frame(&mut self, gol_data: Vec<Vec<bool>>) {
         clear_background(WHITE);
 
         let cell_heigth: f32 = screen_height() / (gol_data.len() as f32);
@@ -32,8 +29,8 @@ impl Screen {
         for iu in 0..gol_data.len() {
             for ju in 0..gol_data[0].len() {
                 let color = match gol_data[iu][ju] {
-                    '1' => BLACK,
-                    '0' => WHITE,
+                    true => BLACK,
+                    false => WHITE,
                     _ => GREEN,
                 };
                 let i: f32 = iu as f32;
@@ -50,7 +47,6 @@ impl Screen {
         }
         next_frame().await
     }
-
 
     // check if a button has been pressed
     // for arrows, move the view by 10% in a given direction
@@ -92,5 +88,16 @@ impl Screen {
         }
 
         refresh
+    }
+
+    pub fn set_area(&mut self, a: i32, b: i32, c: i32, d: i32) {
+        self.posx_min = a;
+        self.posx_max = b;
+        self.posy_min = c;
+        self.posy_max = d;
+    }
+
+    pub fn get_area(&self) -> (i32, i32, i32, i32) {
+        (self.posx_min, self.posx_max, self.posy_min, self.posy_max)
     }
 }
