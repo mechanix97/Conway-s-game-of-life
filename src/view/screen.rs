@@ -120,12 +120,12 @@ impl Screen {
             self.posx_min += mov_x;
         }
 
-        if is_key_pressed(KeyCode::Minus) {
+        if is_key_down(KeyCode::Minus) {
             self.posy_max += mov_y;
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_pressed(KeyCode::Equal) {
+        } else if is_key_down(KeyCode::Equal) {
             if self.posy_max - self.posy_min > 1 {
                 self.posy_max -= mov_y;
                 self.posy_min += mov_y;
@@ -137,6 +137,12 @@ impl Screen {
         }
         if is_key_pressed(KeyCode::P){
             self.paused = !self.paused;
+        }
+        if is_key_pressed(KeyCode::C){
+            self.posx_min = -20;
+            self.posy_min = -20;
+            self.posx_max = 20;
+            self.posy_max = 20;
         }
     }
 
