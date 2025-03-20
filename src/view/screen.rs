@@ -12,7 +12,11 @@ pub struct Screen {
     posy_min: i32,
     posx_max: i32,
     posy_max: i32,
-    paused: bool
+    paused: bool,
+    cols: i32,
+    rows: i32,
+    cell_width: f32,
+    cell_heigth: f32
 }
 
 impl Screen {
@@ -22,28 +26,19 @@ impl Screen {
             posx_max: 0,
             posy_min: 0,
             posy_max: 0,
-            paused: false
+            paused: false,
+            cols: 0,
+            rows: 0,
+            cell_width: 0.0,
+            cell_heigth: 0.0
         }
     }
 
     // receives a hashset indicating the cords of the alive cells
     pub async fn draw_frame(&mut self, gol_data: HashSet<(i32, i32)>, step: u32, cells_alive: u32) {
         clear_background(WHITE);
-
-        let rows = match self.posy_max.abs() - self.posy_min {
-            0 => 1,
-            n => n,
-        };
-        let cols = match self.posx_max.abs() - self.posx_min {
-            0 => 1,
-            n => n,
-        };
-
-        let cell_heigth: f32 = (screen_height() - 30.0) / (rows as f32);
-        let cell_width: f32 = screen_width() / (cols as f32);
-
         if gol_data.len() == 1 {
-            draw_rectangle(0.0, 0.0, cell_width, cell_heigth, BLACK);
+            draw_rectangle(0.0, 0.0, self.cell_width, self.cell_heigth, BLACK);
         }
 
         for cell in &gol_data {
@@ -51,17 +46,17 @@ impl Screen {
             let py = (self.posy_max - cell.1) as f32;
 
             draw_rectangle(
-                px * cell_width,
-                py * cell_heigth,
-                cell_width,
-                cell_heigth,
+                px * self.cell_width,
+                py * self.cell_heigth,
+                self.cell_width,
+                self.cell_heigth,
                 BLACK,
             );
         }
         if self.paused {
             self.draw_pause_icon();
         }
-        if let Some(mouse_poition) = self.get_mouse_position(cell_width, cell_heigth){
+        if let Some(mouse_poition) = self.get_mouse_position(){
             let px = mouse_poition.0 as i32 + self.posx_min as i32 + 1;
             let py = self.posy_max as i32 - mouse_poition.1 as i32;
             let (color1,color2) = match gol_data.contains(&(px, py)) {
@@ -70,18 +65,18 @@ impl Screen {
             };
             
             draw_rectangle(
-                (mouse_poition.0 as f32) * cell_width,
-                (mouse_poition.1 as f32) * cell_heigth,
-                cell_width,
-                cell_heigth,
+                (mouse_poition.0 as f32) * self.cell_width,
+                (mouse_poition.1 as f32) * self.cell_heigth,
+                self.cell_width,
+                self.cell_heigth,
                 color1,
             );
-            let padding = (cell_width * 0.1, cell_heigth * 0.1);
+            let padding = (self.cell_width * 0.1, self.cell_heigth * 0.1);
             draw_rectangle(
-                (mouse_poition.0 as f32) * cell_width + padding.0,
-                (mouse_poition.1 as f32) * cell_heigth + padding.1,
-                cell_width - (padding.0 * 2.0),
-                cell_heigth - (padding.1 * 2.0),
+                (mouse_poition.0 as f32) * self.cell_width + padding.0,
+                (mouse_poition.1 as f32) * self.cell_heigth + padding.1,
+                self.cell_width - (padding.0 * 2.0),
+                self.cell_heigth - (padding.1 * 2.0),
                 color2,
             );
         }
@@ -95,7 +90,7 @@ impl Screen {
     }
 
     // get the cell position if the mouse is on the scree
-    pub fn get_mouse_position(&self, cell_width: f32, cell_heigth: f32) -> Option<(u32,u32)>{
+    pub fn get_mouse_position(&self) -> Option<(u32,u32)>{
         let mouse_position = mouse_position();
 
         match mouse_position {
@@ -106,8 +101,8 @@ impl Screen {
                 mouse_position.1 < screen_height() - FOOTER_HEIGHT
             ) => {
                 Some((
-                    (mouse_position.0 / cell_width) as u32,
-                    (mouse_position.1 / cell_heigth) as u32
+                    (mouse_position.0 / self.cell_width) as u32,
+                    (mouse_position.1 / self.cell_heigth) as u32
                 ))
             }
             _ => None
@@ -138,12 +133,22 @@ impl Screen {
         );
     }
 
+    pub fn mouse_clicked(&mut self) -> Option<(i32,i32)>{
+        if is_mouse_button_down(MouseButton::Left){
+            return match self.get_mouse_position() {
+                Some(pos) => None,
+                None => None
+            }
+        } 
+        None
+    }
+
     // check if a button has been pressed
     // for arrows, move the view by a rate in a given direction
     pub fn check_buttons(&mut self) {
         let mut mov_x = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
         let mut mov_y = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
-
+        let mut refresh = false;
         if mov_x == 0 {
             mov_x = 1;
         }
@@ -152,26 +157,32 @@ impl Screen {
         }
 
         if is_key_down(KeyCode::Down) {
+            refresh = true;
             self.posy_max -= mov_y;
             self.posy_min -= mov_y;
         } else if is_key_down(KeyCode::Up) {
+            refresh = true;
             self.posy_max += mov_y;
             self.posy_min += mov_y;
         }
         if is_key_down(KeyCode::Left) {
+            refresh = true;
             self.posx_max -= mov_x;
             self.posx_min -= mov_x;
         } else if is_key_down(KeyCode::Right) {
+            refresh = true;
             self.posx_max += mov_x;
             self.posx_min += mov_x;
         }
 
         if is_key_down(KeyCode::Minus) {
+            refresh = true;
             self.posy_max += mov_y;
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
         } else if is_key_down(KeyCode::Equal) {
+            refresh = true;
             if self.posy_max - self.posy_min > 1 {
                 self.posy_max -= mov_y;
                 self.posy_min += mov_y;
@@ -185,10 +196,24 @@ impl Screen {
             self.paused = !self.paused;
         }
         if is_key_pressed(KeyCode::C){
+            refresh = true;
             self.posx_min = -20;
             self.posy_min = -20;
             self.posx_max = 20;
             self.posy_max = 20;
+        }
+        if refresh {
+            self.rows = match self.posy_max.abs() - self.posy_min {
+                0 => 1,
+                n => n,
+            };
+            self.cols = match self.posx_max.abs() - self.posx_min {
+                0 => 1,
+                n => n,
+            };
+    
+            self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
+            self.cell_width = screen_width() / (self.cols as f32);    
         }
     }
 
@@ -197,6 +222,18 @@ impl Screen {
         self.posy_min = b;
         self.posx_max = c;
         self.posy_max = d;
+
+        self.rows = match self.posy_max.abs() - self.posy_min {
+            0 => 1,
+            n => n,
+        };
+        self.cols = match self.posx_max.abs() - self.posx_min {
+            0 => 1,
+            n => n,
+        };
+
+        self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
+        self.cell_width = screen_width() / (self.cols as f32); 
     }
 
     pub fn get_area(&self) -> (i32, i32, i32, i32) {

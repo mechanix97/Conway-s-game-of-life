@@ -44,7 +44,7 @@ async fn main() {
             running.store(false, Ordering::Relaxed);
             break;
         }
-        let _ = screen.check_buttons();
+        screen.check_buttons();
         let area = screen.get_area();
         let data;
         let step;
@@ -57,6 +57,11 @@ async fn main() {
         if paused.load(Ordering::Relaxed) != screen.is_paused(){
             paused.store(screen.is_paused(), Ordering::Relaxed, );
         }
+
+        // if screen.mouse_clicked(){
+        //     let (cord_x, cord_y) = screen.get_mouse_cords();
+        //     gol.write().unwrap().change_cell_status(cord_x, cord_y);
+        // }
         screen.draw_frame(data, step, cells_alive).await;
     }
 
