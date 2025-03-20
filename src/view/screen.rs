@@ -4,6 +4,8 @@ use macroquad::prelude::*;
 
 const MOVEMENT_RATE: f32 = 0.01;
 
+const FOOTER_HEIGHT: f32 = 30.0;
+
 //pos* indicates the area of the simulation to show in the screen
 pub struct Screen {
     posx_min: i32,
@@ -44,7 +46,7 @@ impl Screen {
             draw_rectangle(0.0, 0.0, cell_width, cell_heigth, BLACK);
         }
 
-        for cell in gol_data {
+        for cell in &gol_data {
             let px = (cell.0 - self.posx_min - 1) as f32;
             let py = (self.posy_max - cell.1) as f32;
 
@@ -59,7 +61,30 @@ impl Screen {
         if self.paused {
             self.draw_pause_icon();
         }
-
+        if let Some(mouse_poition) = self.get_mouse_position(cell_width, cell_heigth){
+            let px = mouse_poition.0 as i32 + self.posx_min as i32 + 1;
+            let py = self.posy_max as i32 - mouse_poition.1 as i32;
+            let (color1,color2) = match gol_data.contains(&(px, py)) {
+                true => (GRAY, BLACK),
+                false => (BLACK, WHITE)
+            };
+            
+            draw_rectangle(
+                (mouse_poition.0 as f32) * cell_width,
+                (mouse_poition.1 as f32) * cell_heigth,
+                cell_width,
+                cell_heigth,
+                color1,
+            );
+            let padding = (cell_width * 0.1, cell_heigth * 0.1);
+            draw_rectangle(
+                (mouse_poition.0 as f32) * cell_width + padding.0,
+                (mouse_poition.1 as f32) * cell_heigth + padding.1,
+                cell_width - (padding.0 * 2.0),
+                cell_heigth - (padding.1 * 2.0),
+                color2,
+            );
+        }
         self.draw_footer(step, cells_alive);
         next_frame().await
     }
@@ -69,8 +94,29 @@ impl Screen {
         draw_rectangle(40.0, 20.0, 10.0, 30.0, RED);
     }
 
+    // get the cell position if the mouse is on the scree
+    pub fn get_mouse_position(&self, cell_width: f32, cell_heigth: f32) -> Option<(u32,u32)>{
+        let mouse_position = mouse_position();
+
+        match mouse_position {
+            mouse_position if (
+                mouse_position.0 > 0.0 &&
+                mouse_position.1 > 0.0 &&
+                mouse_position.0 < screen_width() &&
+                mouse_position.1 < screen_height() - FOOTER_HEIGHT
+            ) => {
+                Some((
+                    (mouse_position.0 / cell_width) as u32,
+                    (mouse_position.1 / cell_heigth) as u32
+                ))
+            }
+            _ => None
+
+        }
+    }
+
     pub fn draw_footer(&self, step: u32, cells_alive: u32) {
-        draw_rectangle(0.0, screen_height() - 30.0, screen_width(), 30.0, GRAY);
+        draw_rectangle(0.0, screen_height() - FOOTER_HEIGHT, screen_width(), FOOTER_HEIGHT, GRAY);
         let posx_mid = (self.posx_max + self.posx_min) / 2;
         let posy_mid = (self.posy_max + self.posy_min) / 2;
 
