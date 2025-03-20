@@ -16,4 +16,15 @@ My implementation of Conway's game of life.
 
 ## Dependencies
 
-It's built using Rust and uses Make to run
+It's built using Rust with the crate macroquad and uses Make to run
+
+## Controls
+- Arrows movement
+- \- zoom out
+- = zoom in
+- P pause
+- C center
+- R reset
+- T randomize
+- Left click add/remove a cell
+- Right click add/remove multiple cells while pressed
