@@ -47,6 +47,14 @@ impl GameOfLife {
         self.alive_cells.insert((pos_x, pos_y));
     }
 
+
+    pub fn change_cell_status(&mut self, pos_x: i32, pos_y: i32) {
+        match self.alive_cells.contains(&(pos_x, pos_y)){
+            true => { self.alive_cells.remove(&(pos_x,pos_y));},
+            false =>{ self.alive_cells.insert((pos_x, pos_y));}
+        }
+        
+    }
     pub fn step(&mut self) {
         self.step += 1;
 
@@ -105,10 +113,6 @@ impl GameOfLife {
             (x, y - 1),
             (x + 1, y - 1),
         ]
-    }
-
-    pub fn step_delay(&self, msecs: u64) {
-        thread::sleep(time::Duration::from_millis(msecs));
     }
 
     // Convert data into a readble output

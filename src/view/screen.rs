@@ -133,10 +133,15 @@ impl Screen {
         );
     }
 
-    pub fn mouse_clicked(&mut self) -> Option<(i32,i32)>{
-        if is_mouse_button_down(MouseButton::Left){
+    pub fn mouse_clicked_pos(&mut self) -> Option<(i32,i32)>{
+        if is_mouse_button_pressed(MouseButton::Left){
             return match self.get_mouse_position() {
-                Some(pos) => None,
+                Some(pos) =>{
+                    Some((
+                        pos.0 as i32 + self.posx_min as i32 + 1,
+                        self.posy_max as i32 - pos.1 as i32
+                    )) 
+                },
                 None => None
             }
         } 

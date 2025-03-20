@@ -4,6 +4,7 @@ pub mod view;
 use std::sync::{Arc, RwLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
+use std::time::Duration;
 use macroquad::prelude::*;
 
 use model::game_of_life::GameOfLife;
@@ -16,7 +17,7 @@ async fn main() {
     let mut screen = Screen::new();
     screen.set_area(-20, -20, 20, 20);
     let gol = Arc::new(RwLock::new(GameOfLife::new()));
-    gol.write().unwrap().randomize_area(-20, -20, 20, 20);
+    // gol.write().unwrap().randomize_area(-20, -20, 20, 20);
 
     let paused = Arc::new(AtomicBool::new(false));
     let running = Arc::new(AtomicBool::new(true));
@@ -35,7 +36,7 @@ async fn main() {
             if !paused_clone.load(Ordering::Relaxed) {
                 gol_clone.write().unwrap().step();
             }
-            gol_clone.read().unwrap().step_delay(100);
+            thread::sleep(Duration::from_millis(100));
         }
     });
     
@@ -58,10 +59,9 @@ async fn main() {
             paused.store(screen.is_paused(), Ordering::Relaxed, );
         }
 
-        // if screen.mouse_clicked(){
-        //     let (cord_x, cord_y) = screen.get_mouse_cords();
-        //     gol.write().unwrap().change_cell_status(cord_x, cord_y);
-        // }
+        if let Some(pos) = screen.mouse_clicked_pos(){
+            gol.write().unwrap().change_cell_status(pos.0, pos.1);
+        }
         screen.draw_frame(data, step, cells_alive).await;
     }
 
