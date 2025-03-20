@@ -91,7 +91,7 @@ impl GameOfLife {
         ]
     }
 
-    pub fn step_delay(&mut self, msecs: u64) {
+    pub fn step_delay(&self, msecs: u64) {
         thread::sleep(time::Duration::from_millis(msecs));
     }
 
@@ -140,7 +140,7 @@ impl GameOfLife {
         data_as_str
     }
 
-    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> Vec<Vec<bool>> {
+    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32,i32)> {
         let (mut min_x, mut min_y, mut max_x, mut max_y) = area;
         if min_x > max_x {
             let aux = min_x;
@@ -152,13 +152,8 @@ impl GameOfLife {
             min_y = max_y;
             max_y = aux;
         }
-
-        // Calculate screen size from input
-        let width = (max_x - min_x + 1).try_into().unwrap();
-        let height = (max_y - min_y + 1).try_into().unwrap();
-
-        let mut output: Vec<Vec<bool>> = vec![vec!(false; width); height];
-
+        
+        let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self
             .alive_cells
@@ -166,9 +161,9 @@ impl GameOfLife {
             .filter(|(a, b)| *a >= min_x && *a <= max_x && *b >= min_y && *b <= max_y)
         {
             // rotate for better diplay
-            let pos_x: usize = (max_x - x).try_into().unwrap();
-            let pos_y: usize = (y - min_y).try_into().unwrap();
-            output[pos_x][pos_y] = true;
+            let pos_x: i32 = (max_x - x).try_into().unwrap();
+            let pos_y: i32 = (y - min_y).try_into().unwrap();
+            output.insert((pos_x, pos_y));
         }
 
         output
