@@ -32,18 +32,14 @@ impl Screen {
         let cell_heigth: f32 = (screen_height() - 30.0)/ (rows as f32);
         let cell_width: f32 = screen_width() / (cols as f32);
 
-        for i in 0..rows {
-            for j in 0..cols {
-                if gol_data.contains(&(i,j)) {
-                    draw_rectangle(
-                        (j as f32) * cell_width,
-                        (i as f32) * cell_heigth,
-                        cell_width,
-                        cell_heigth,
-                        BLACK,
-                    );
-                }  
-            }
+        for cell in gol_data {
+            draw_rectangle(
+                (cell.1 as f32) * cell_width,
+                (cell.0 as f32) * cell_heigth,
+                cell_width,
+                cell_heigth,
+                BLACK,
+            );
         }
         self.draw_footer(step, cells_alive);
         next_frame().await
