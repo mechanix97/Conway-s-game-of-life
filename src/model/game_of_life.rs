@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::collections::HashSet;
-use std::{fmt, thread, time};
+use std::fmt;
 
 pub struct GameOfLife {
     alive_cells: HashSet<(i32, i32)>,
@@ -184,6 +184,11 @@ impl GameOfLife {
         }
 
         output
+    }
+
+    pub fn clear_cells(&mut self){
+        self.alive_cells.clear();
+        self.step = 0;
     }
 }
 

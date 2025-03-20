@@ -17,7 +17,6 @@ async fn main() {
     let mut screen = Screen::new();
     screen.set_area(-20, -20, 20, 20);
     let gol = Arc::new(RwLock::new(GameOfLife::new()));
-    // gol.write().unwrap().randomize_area(-20, -20, 20, 20);
 
     let paused = Arc::new(AtomicBool::new(false));
     let running = Arc::new(AtomicBool::new(true));
@@ -57,6 +56,16 @@ async fn main() {
         }
         if paused.load(Ordering::Relaxed) != screen.is_paused(){
             paused.store(screen.is_paused(), Ordering::Relaxed, );
+        }
+        if screen.is_reset(){
+            gol.write().unwrap().clear_cells();
+            screen.set_reset(false);
+        }
+
+        if screen.is_random(){
+            gol.write().unwrap().clear_cells();
+            gol.write().unwrap().randomize_area(-20, -20, 20, 20);
+            screen.set_random(false);
         }
 
         if let Some(pos) = screen.mouse_clicked_pos(){
