@@ -105,27 +105,27 @@ impl Screen {
             mov_y = 1;
         }
 
-        if is_key_released(KeyCode::Down) {
+        if is_key_down(KeyCode::Down) {
             self.posy_max -= mov_y;
             self.posy_min -= mov_y;
-        } else if is_key_released(KeyCode::Up) {
+        } else if is_key_down(KeyCode::Up) {
             self.posy_max += mov_y;
             self.posy_min += mov_y;
         }
-        if is_key_released(KeyCode::Left) {
+        if is_key_down(KeyCode::Left) {
             self.posx_max -= mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_released(KeyCode::Right) {
+        } else if is_key_down(KeyCode::Right) {
             self.posx_max += mov_x;
             self.posx_min += mov_x;
         }
 
-        if is_key_released(KeyCode::Minus) {
+        if is_key_pressed(KeyCode::Minus) {
             self.posy_max += mov_y;
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_released(KeyCode::Equal) {
+        } else if is_key_pressed(KeyCode::Equal) {
             if self.posy_max - self.posy_min > 1 {
                 self.posy_max -= mov_y;
                 self.posy_min += mov_y;
@@ -135,7 +135,7 @@ impl Screen {
                 self.posx_min += mov_x;
             }
         }
-        if is_key_released(KeyCode::P){
+        if is_key_pressed(KeyCode::P){
             self.paused = !self.paused;
         }
     }
@@ -149,5 +149,9 @@ impl Screen {
 
     pub fn get_area(&self) -> (i32, i32, i32, i32) {
         (self.posx_min, self.posy_min, self.posx_max, self.posy_max)
+    }
+
+    pub fn is_paused(&self) -> bool {
+        self.paused
     }
 }

@@ -169,7 +169,6 @@ impl GameOfLife {
             max_y = aux;
         }
 
-        println!("({},{})({},{})", min_x, min_y, max_x, max_y);
         let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self
