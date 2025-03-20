@@ -74,8 +74,12 @@ impl GameOfLife {
         count
     }
 
-    fn count_alive_cells(&self) -> usize {
+    pub fn count_alive_cells(&self) -> usize {
         self.alive_cells.len()
+    }
+
+    pub fn get_steps_count(&self) -> u32 {
+        self.step
     }
 
     fn get_neighbors(&self, x: i32, y: i32) -> Vec<(i32, i32)> {
@@ -152,7 +156,7 @@ impl GameOfLife {
             min_y = max_y;
             max_y = aux;
         }
-        
+
         let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self

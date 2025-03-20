@@ -2,8 +2,9 @@ use std::collections::HashSet;
 
 use macroquad::prelude::*;
 
-//pos* indicates the area of the simulation to show in the screen
+const MOVEMENT_RATE: f32 = 0.03;
 
+//pos* indicates the area of the simulation to show in the screen
 pub struct Screen {
     posx_min: i32,
     posy_min: i32,
@@ -22,7 +23,7 @@ impl Screen {
     }
 
     // receives a hashset indicating the cords of the alive cells
-    pub async fn draw_frame(&mut self, gol_data: HashSet<(i32,i32)>) {
+    pub async fn draw_frame(&mut self, gol_data: HashSet<(i32,i32)> , step: u32, cells_alive: u32) {
         clear_background(WHITE);
 
         let rows = self.posy_max.abs() - self.posy_min;
@@ -44,12 +45,12 @@ impl Screen {
                 }  
             }
         }
-        self.draw_footer();
+        self.draw_footer(step, cells_alive);
         next_frame().await
     }
 
 
-    pub fn draw_footer(&self) {
+    pub fn draw_footer(&self, step: u32, cells_alive: u32) {
         draw_rectangle(
             0.0,
             screen_height() - 30.0,
@@ -57,7 +58,7 @@ impl Screen {
             30.0,
             GRAY,
         );
-        draw_text(format!("STEP: {}     CELLS ALIVE: {}", 5, 12).as_str(), 5.0 ,screen_height() - 7.0 , 25.0, BLACK);
+        draw_text(format!("STEP: {}     CELLS ALIVE: {}", step, cells_alive).as_str(), 5.0 ,screen_height() - 7.0 , 25.0, BLACK);
     }
 
     // check if a button has been pressed

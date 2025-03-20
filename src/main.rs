@@ -32,8 +32,14 @@ async fn main() {
         let _ = screen.check_buttons();
         let area = screen.get_area();
         let data;
-        {data = gol.read().unwrap().data_as_vec(area);}
-        screen.draw_frame(data).await;
+        let step; 
+        let cells_alive;
+        {
+            data = gol.read().unwrap().data_as_vec(area);
+            step = gol.read().unwrap().get_steps_count();
+            cells_alive = gol.read().unwrap().count_alive_cells() as u32;
+        }
+        screen.draw_frame(data, step, cells_alive).await;
     }
 
     running = false;
