@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use macroquad::prelude::*;
 
-const MOVEMENT_RATE: f32 = 0.03;
+const MOVEMENT_RATE: f32 = 0.01;
 
 //pos* indicates the area of the simulation to show in the screen
 pub struct Screen {
@@ -58,7 +58,12 @@ impl Screen {
             30.0,
             GRAY,
         );
-        draw_text(format!("STEP: {}     CELLS ALIVE: {}", step, cells_alive).as_str(), 5.0 ,screen_height() - 7.0 , 25.0, BLACK);
+        let posx_mid = (self.posx_max + self.posx_min)/2;
+        let posy_mid = (self.posy_max + self.posy_min)/2;
+
+        draw_text(
+            format!("STEP: {}     CELLS ALIVE: {}          POS: ({},{})", step, cells_alive, posx_mid, posy_mid).as_str(), 
+            5.0 ,screen_height() - 7.0 , 25.0, BLACK);
     }
 
     // check if a button has been pressed
@@ -92,10 +97,14 @@ impl Screen {
             self.posx_min -= mov_x;
 
         } else if is_key_down(KeyCode::Equal){
-            self.posy_max -= mov_y;
-            self.posy_min += mov_y;
-            self.posx_max -= mov_x;
-            self.posx_min += mov_x;
+            if self.posy_max - self.posy_min > 1 {
+                self.posy_max -= mov_y;
+                self.posy_min += mov_y;
+            }
+            if self.posx_max - self.posx_min > 1 {
+                self.posx_max -= mov_x;
+                self.posx_min += mov_x;
+            }
         }
     }
 
