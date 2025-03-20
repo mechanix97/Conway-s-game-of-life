@@ -13,9 +13,9 @@ use view::screen::Screen;
 #[macroquad::main("Conway's game of life")]
 async fn main() {
     let mut screen = Screen::new();
-    screen.set_area(-10, -10,40 , 40);
+    screen.set_area(-20,-20, 20  ,20);
     let gol = Arc::new(RwLock::new(GameOfLife::new()));
-    gol.write().unwrap().randomize(Some(30), Some(30));
+    gol.write().unwrap().randomize_area(-20,-20,20,20);
 
 
     let mut running = true;

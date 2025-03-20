@@ -31,6 +31,19 @@ impl GameOfLife {
         }
     }
 
+    pub fn randomize_area(&mut self, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
+        let mut rng = rand::rng();
+
+        for i in min_x..=max_x {
+            for j in min_y..=max_y {
+                if rng.random::<f64>() < 0.2 {
+                    self.alive_cells
+                        .insert((i, j));
+                }
+            }
+        }
+    }
+
     pub fn add_alive_cell(&mut self, pos_x: i32, pos_y: i32) {
         self.alive_cells.insert((pos_x, pos_y));
     }
@@ -157,6 +170,7 @@ impl GameOfLife {
             max_y = aux;
         }
 
+        println!("({},{})({},{})", min_x,min_y,max_x,max_y);
         let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self
@@ -164,10 +178,7 @@ impl GameOfLife {
             .iter()
             .filter(|(a, b)| *a >= min_x && *a <= max_x && *b >= min_y && *b <= max_y)
         {
-            // rotate for better diplay
-            let pos_x: i32 = (max_x - x).try_into().unwrap();
-            let pos_y: i32 = (y - min_y).try_into().unwrap();
-            output.insert((pos_x, pos_y));
+            output.insert((*x, *y));
         }
 
         output
