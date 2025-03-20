@@ -28,7 +28,7 @@ impl Screen {
             posx_max: 0,
             posy_min: 0,
             posy_max: 0,
-            paused: false,
+            paused: true,
             reset: false,
             randomize: false,
             cols: 0,
@@ -44,6 +44,9 @@ impl Screen {
         if gol_data.len() == 1 {
             draw_rectangle(0.0, 0.0, self.cell_width, self.cell_heigth, BLACK);
         }
+
+        self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
+        self.cell_width = screen_width() / (self.cols as f32); 
 
         for cell in &gol_data {
             let px = (cell.0 - self.posx_min - 1) as f32;
@@ -195,13 +198,13 @@ impl Screen {
             self.posx_min += mov_x;
         }
         // zoom out
-        if is_key_down(KeyCode::Minus) {
+        if is_key_down(KeyCode::O) {
             refresh = true;
             self.posy_max += mov_y;
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_down(KeyCode::Equal) { //zoom in
+        } else if is_key_down(KeyCode::I) { //zoom in
             refresh = true;
         
             let center_x = (self.posx_max + self.posx_min) / 2;

@@ -20,8 +20,8 @@ It's built using Rust with the crate macroquad and uses Make to run
 
 ## Controls
 - Arrows movement
-- \- zoom out
-- = zoom in
+- O zoom out
+- I zoom in
 - P pause
 - C center
 - R reset
