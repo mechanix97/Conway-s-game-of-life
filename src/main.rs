@@ -4,37 +4,35 @@ pub mod view;
 use std::sync::{Arc, RwLock};
 use std::thread;
 
-
 use model::game_of_life::GameOfLife;
 use view::screen::Screen;
-
-
 
 #[macroquad::main("Conway's game of life")]
 async fn main() {
     let mut screen = Screen::new();
-    screen.set_area(-20,-20, 20  ,20);
+    screen.set_area(-20, -20, 20, 20);
     let gol = Arc::new(RwLock::new(GameOfLife::new()));
-    gol.write().unwrap().randomize_area(-20,-20,20,20);
-
+    gol.write().unwrap().randomize_area(-20, -20, 20, 20);
 
     let mut running = true;
 
     let gol_clone = gol.clone();
 
     //Spawn the simulation in a new thread for better performace
-    let join = thread::spawn(move || {
-       while running{
-            {gol_clone.write().unwrap().step();}
+    let join_handle = thread::spawn(move || {
+        while running {
+            {
+                gol_clone.write().unwrap().step();
+            }
             gol_clone.read().unwrap().step_delay(100);
-       }
+        }
     });
 
     loop {
         let _ = screen.check_buttons();
         let area = screen.get_area();
         let data;
-        let step; 
+        let step;
         let cells_alive;
         {
             data = gol.read().unwrap().data_as_vec(area);
@@ -45,5 +43,5 @@ async fn main() {
     }
 
     running = false;
-    let _ = join.join();
+    let _ = join_handle.join().unwrap();
 }

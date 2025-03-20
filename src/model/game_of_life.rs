@@ -37,8 +37,7 @@ impl GameOfLife {
         for i in min_x..=max_x {
             for j in min_y..=max_y {
                 if rng.random::<f64>() < 0.2 {
-                    self.alive_cells
-                        .insert((i, j));
+                    self.alive_cells.insert((i, j));
                 }
             }
         }
@@ -157,7 +156,7 @@ impl GameOfLife {
         data_as_str
     }
 
-    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32,i32)> {
+    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32, i32)> {
         let (mut min_x, mut min_y, mut max_x, mut max_y) = area;
         if min_x > max_x {
             let aux = min_x;
@@ -170,7 +169,7 @@ impl GameOfLife {
             max_y = aux;
         }
 
-        println!("({},{})({},{})", min_x,min_y,max_x,max_y);
+        println!("({},{})({},{})", min_x, min_y, max_x, max_y);
         let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self

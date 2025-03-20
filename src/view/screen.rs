@@ -1,4 +1,4 @@
-use std::{collections::HashSet, ops::DerefMut};
+use std::collections::HashSet;
 
 use macroquad::prelude::*;
 
@@ -10,6 +10,7 @@ pub struct Screen {
     posy_min: i32,
     posx_max: i32,
     posy_max: i32,
+    paused: bool
 }
 
 impl Screen {
@@ -19,41 +20,34 @@ impl Screen {
             posx_max: 0,
             posy_min: 0,
             posy_max: 0,
+            paused: false
         }
     }
 
     // receives a hashset indicating the cords of the alive cells
-    pub async fn draw_frame(&mut self, gol_data: HashSet<(i32,i32)> , step: u32, cells_alive: u32) {
+    pub async fn draw_frame(&mut self, gol_data: HashSet<(i32, i32)>, step: u32, cells_alive: u32) {
         clear_background(WHITE);
 
         let rows = match self.posy_max.abs() - self.posy_min {
             0 => 1,
-            n => n
+            n => n,
         };
-        let cols = match self.posx_max.abs() - self.posx_min{
+        let cols = match self.posx_max.abs() - self.posx_min {
             0 => 1,
-            n => n
-        } ; 
+            n => n,
+        };
 
-        let cell_heigth: f32 = (screen_height() - 30.0)/ (rows as f32);
+        let cell_heigth: f32 = (screen_height() - 30.0) / (rows as f32);
         let cell_width: f32 = screen_width() / (cols as f32);
 
-
         if gol_data.len() == 1 {
-            draw_rectangle(
-                0.0,
-                0.0,
-                cell_width,
-                cell_heigth,
-                BLACK,
-            );
+            draw_rectangle(0.0, 0.0, cell_width, cell_heigth, BLACK);
         }
 
         for cell in gol_data {
-            let px = (cell.0 - self.posx_min - 1)as f32;
-            let py = (self.posy_max - cell.1 )as f32;
-            
-            
+            let px = (cell.0 - self.posx_min - 1) as f32;
+            let py = (self.posy_max - cell.1) as f32;
+
             draw_rectangle(
                 px * cell_width,
                 py * cell_heigth,
@@ -62,30 +56,40 @@ impl Screen {
                 BLACK,
             );
         }
+        if self.paused {
+            self.draw_pause_icon();
+        }
+
         self.draw_footer(step, cells_alive);
         next_frame().await
     }
 
+    pub fn draw_pause_icon(&self){
+        draw_rectangle(20.0, 20.0, 10.0, 30.0, RED);
+        draw_rectangle(40.0, 20.0, 10.0, 30.0, RED);
+    }
 
     pub fn draw_footer(&self, step: u32, cells_alive: u32) {
-        draw_rectangle(
-            0.0,
-            screen_height() - 30.0,
-            screen_width(),
-            30.0,
-            GRAY,
-        );
-        let posx_mid = (self.posx_max + self.posx_min)/2;
-        let posy_mid = (self.posy_max + self.posy_min)/2;
+        draw_rectangle(0.0, screen_height() - 30.0, screen_width(), 30.0, GRAY);
+        let posx_mid = (self.posx_max + self.posx_min) / 2;
+        let posy_mid = (self.posy_max + self.posy_min) / 2;
 
         draw_text(
-            format!("STEP: {}     CELLS ALIVE: {}", step, cells_alive).as_str(), 
-            5.0 ,screen_height() - 7.0 , 25.0, BLACK);
-        
+            format!("STEP: {}     CELLS ALIVE: {}", step, cells_alive).as_str(),
+            5.0,
+            screen_height() - 7.0,
+            25.0,
+            BLACK,
+        );
+
         let pos_text = format!("POS:({},{})", posx_mid, posy_mid);
-        draw_text( pos_text.as_str(), 
-        screen_width()  - (pos_text.len()*12) as f32   ,screen_height() - 7.0 , 25.0, BLACK);
-    
+        draw_text(
+            pos_text.as_str(),
+            screen_width() - (pos_text.len() * 12) as f32,
+            screen_height() - 7.0,
+            25.0,
+            BLACK,
+        );
     }
 
     // check if a button has been pressed
@@ -94,31 +98,34 @@ impl Screen {
         let mut mov_x = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
         let mut mov_y = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
 
-        if mov_x == 0 {mov_x=1;}
-        if mov_y == 0 {mov_y=1;}
+        if mov_x == 0 {
+            mov_x = 1;
+        }
+        if mov_y == 0 {
+            mov_y = 1;
+        }
 
-        if is_key_down(KeyCode::Down) {
+        if is_key_released(KeyCode::Down) {
             self.posy_max -= mov_y;
             self.posy_min -= mov_y;
-        } else if is_key_down(KeyCode::Up) {
+        } else if is_key_released(KeyCode::Up) {
             self.posy_max += mov_y;
             self.posy_min += mov_y;
         }
-        if is_key_down(KeyCode::Left) {
+        if is_key_released(KeyCode::Left) {
             self.posx_max -= mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_down(KeyCode::Right) {
+        } else if is_key_released(KeyCode::Right) {
             self.posx_max += mov_x;
             self.posx_min += mov_x;
         }
 
-        if is_key_down(KeyCode::Minus){
+        if is_key_released(KeyCode::Minus) {
             self.posy_max += mov_y;
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
-
-        } else if is_key_down(KeyCode::Equal){
+        } else if is_key_released(KeyCode::Equal) {
             if self.posy_max - self.posy_min > 1 {
                 self.posy_max -= mov_y;
                 self.posy_min += mov_y;
@@ -127,6 +134,9 @@ impl Screen {
                 self.posx_max -= mov_x;
                 self.posx_min += mov_x;
             }
+        }
+        if is_key_released(KeyCode::P){
+            self.paused = !self.paused;
         }
     }
 
