@@ -21,6 +21,8 @@ async fn main() {
     let mut running = true;
 
     let gol_clone = gol.clone();
+
+    //Spawn the simulation in a new thread for better performace
     let join = thread::spawn(move || {
        while running{
             {gol_clone.write().unwrap().step();}

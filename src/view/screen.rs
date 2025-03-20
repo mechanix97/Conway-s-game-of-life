@@ -62,77 +62,41 @@ impl Screen {
     }
 
     // check if a button has been pressed
-    // for arrows, move the view by 10% in a given direction
-    pub fn check_buttons(&mut self) -> bool {
-        let mut refresh = false;
+    // for arrows, move the view by a rate in a given direction
+    pub fn check_buttons(&mut self) {
+        let mut mov_x = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
+        let mut mov_y = ((self.posy_max.abs() - self.posy_min) as f32 * MOVEMENT_RATE) as i32;
+
+        if mov_x == 0 {mov_x=1;}
+        if mov_y == 0 {mov_y=1;}
+
         if is_key_down(KeyCode::Left) {
-            refresh = true;
-            let mut mov = (self.posy_max.abs() - self.posy_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posy_max -= mov;
-            self.posy_min -= mov;
+            self.posy_max -= mov_y;
+            self.posy_min -= mov_y;
         } else if is_key_down(KeyCode::Right) {
-            refresh = true;
-            let mut mov = (self.posy_max.abs() - self.posy_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posy_max += mov;
-            self.posy_min += mov;
+            self.posy_max += mov_y;
+            self.posy_min += mov_y;
         }
         if is_key_down(KeyCode::Down) {
-            refresh = true;
-            let mut mov = (self.posx_max.abs() - self.posx_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posx_max -= mov;
-            self.posx_min -= mov;
+            self.posx_max -= mov_x;
+            self.posx_min -= mov_x;
         } else if is_key_down(KeyCode::Up) {
-            refresh = true;
-            let mut mov = (self.posx_max.abs() - self.posx_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posx_max += mov;
-            self.posx_min += mov;
+            self.posx_max += mov_x;
+            self.posx_min += mov_x;
         }
 
         if is_key_down(KeyCode::Minus){
-            refresh = true;
-            let mut mov = (self.posy_max.abs() - self.posy_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posy_max += mov;
-            self.posy_min -= mov;
-            mov = (self.posx_max.abs() - self.posx_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posx_max += mov;
-            self.posx_min -= mov;
+            self.posy_max += mov_y;
+            self.posy_min -= mov_y;
+            self.posx_max += mov_x;
+            self.posx_min -= mov_x;
 
+        } else if is_key_down(KeyCode::Equal){
+            self.posy_max -= mov_y;
+            self.posy_min += mov_y;
+            self.posx_max -= mov_x;
+            self.posx_min += mov_x;
         }
-        if is_key_down(KeyCode::Equal){
-            refresh = true;
-            let mut mov = (self.posy_max.abs() - self.posy_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posy_max -= mov;
-            self.posy_min += mov;
-            mov = (self.posx_max.abs() - self.posx_min) / 20;
-            if mov == 0 {
-                mov = 1;
-            }
-            self.posx_max -= mov;
-            self.posx_min += mov;
-        }
-
-        refresh
     }
 
     pub fn set_area(&mut self, a: i32, b: i32, c: i32, d: i32) {
