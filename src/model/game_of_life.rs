@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::collections::HashSet;
-use std::{fmt, thread, time};
+use std::fmt;
 
 pub struct GameOfLife {
     alive_cells: HashSet<(i32, i32)>,
@@ -31,10 +31,30 @@ impl GameOfLife {
         }
     }
 
+    pub fn randomize_area(&mut self, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
+        let mut rng = rand::rng();
+
+        for i in min_x..=max_x {
+            for j in min_y..=max_y {
+                if rng.random::<f64>() < 0.2 {
+                    self.alive_cells.insert((i, j));
+                }
+            }
+        }
+    }
+
     pub fn add_alive_cell(&mut self, pos_x: i32, pos_y: i32) {
         self.alive_cells.insert((pos_x, pos_y));
     }
 
+
+    pub fn change_cell_status(&mut self, pos_x: i32, pos_y: i32) {
+        match self.alive_cells.contains(&(pos_x, pos_y)){
+            true => { self.alive_cells.remove(&(pos_x,pos_y));},
+            false =>{ self.alive_cells.insert((pos_x, pos_y));}
+        }
+        
+    }
     pub fn step(&mut self) {
         self.step += 1;
 
@@ -74,8 +94,12 @@ impl GameOfLife {
         count
     }
 
-    fn count_alive_cells(&self) -> usize {
+    pub fn count_alive_cells(&self) -> usize {
         self.alive_cells.len()
+    }
+
+    pub fn get_steps_count(&self) -> u32 {
+        self.step
     }
 
     fn get_neighbors(&self, x: i32, y: i32) -> Vec<(i32, i32)> {
@@ -89,10 +113,6 @@ impl GameOfLife {
             (x, y - 1),
             (x + 1, y - 1),
         ]
-    }
-
-    pub fn step_delay(&self, msecs: u64) {
-        thread::sleep(time::Duration::from_millis(msecs));
     }
 
     // Convert data into a readble output
@@ -140,7 +160,7 @@ impl GameOfLife {
         data_as_str
     }
 
-    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32,i32)> {
+    pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32, i32)> {
         let (mut min_x, mut min_y, mut max_x, mut max_y) = area;
         if min_x > max_x {
             let aux = min_x;
@@ -152,7 +172,7 @@ impl GameOfLife {
             min_y = max_y;
             max_y = aux;
         }
-        
+
         let mut output = HashSet::new();
         // Filter only the cell in the region to draw
         for (x, y) in self
@@ -160,13 +180,15 @@ impl GameOfLife {
             .iter()
             .filter(|(a, b)| *a >= min_x && *a <= max_x && *b >= min_y && *b <= max_y)
         {
-            // rotate for better diplay
-            let pos_x: i32 = (max_x - x).try_into().unwrap();
-            let pos_y: i32 = (y - min_y).try_into().unwrap();
-            output.insert((pos_x, pos_y));
+            output.insert((*x, *y));
         }
 
         output
+    }
+
+    pub fn clear_cells(&mut self){
+        self.alive_cells.clear();
+        self.step = 0;
     }
 }
 
