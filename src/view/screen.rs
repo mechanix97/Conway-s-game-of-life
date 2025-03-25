@@ -38,7 +38,8 @@ impl Screen {
         }
     }
 
-    // receives a hashset indicating the cords of the alive cells
+    /// receives a hashset indicating the coords of the alive cells
+    /// the coords are relative to the bottom left corner
     pub async fn draw_frame(&mut self, gol_data: HashSet<(i32, i32)>, step: u32, cells_alive: u32) {
         clear_background(WHITE);
         if gol_data.len() == 1 {
@@ -48,6 +49,7 @@ impl Screen {
         self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
         self.cell_width = screen_width() / (self.cols as f32); 
 
+        // draw the cells
         for cell in &gol_data {
             let px = (cell.0 - self.posx_min - 1) as f32;
             let py = (self.posy_max - cell.1) as f32;
@@ -60,9 +62,13 @@ impl Screen {
                 BLACK,
             );
         }
+        // check if paused
         if self.paused {
             self.draw_pause_icon();
         }
+
+        // draw the mouse hover
+        // if the position has a cell, change the colors
         if let Some(mouse_poition) = self.get_mouse_position(){
             let px = mouse_poition.0 as i32 + self.posx_min as i32 + 1;
             let py = self.posy_max as i32 - mouse_poition.1 as i32;
@@ -87,6 +93,8 @@ impl Screen {
                 color2,
             );
         }
+
+        // draw footer
         self.draw_footer(step, cells_alive);
         next_frame().await
     }
@@ -96,7 +104,7 @@ impl Screen {
         draw_rectangle(40.0, 20.0, 10.0, 30.0, RED);
     }
 
-    // get the cell position if the mouse is on the scree
+    /// get the cell position if the mouse is on the screen
     pub fn get_mouse_position(&self) -> Option<(u32,u32)>{
         let mouse_position = mouse_position();
 
@@ -140,6 +148,7 @@ impl Screen {
         );
     }
 
+    /// get the grid position of the mouse
     pub fn mouse_clicked_pos(&mut self) -> Option<(i32,i32)>{
         if is_mouse_button_pressed(MouseButton::Left) ||
         is_mouse_button_down(MouseButton::Right){
@@ -156,8 +165,13 @@ impl Screen {
         None
     }
 
-    // check if a button has been pressed
-    // for arrows, move the view by a rate in a given direction
+    /// check if a button has been pressed
+    /// for arrows, move the view by a rate in a given direction
+    /// I O for zoom
+    /// P pause the game
+    /// R reset the game
+    /// C center the grid
+    /// T randomize an areas
     pub fn check_buttons(&mut self) {
         let mut mov_y = match self.posy_max < 0 {
             true => ((self.posy_max - self.posy_min).abs() as f32 * MOVEMENT_RATE) as i32,
@@ -260,6 +274,7 @@ impl Screen {
         }
     }
 
+    /// set the view area and change the aditional information of the screen
     pub fn set_area(&mut self, a: i32, b: i32, c: i32, d: i32) {
         self.posx_min = a;
         self.posy_min = b;
