@@ -15,22 +15,6 @@ impl GameOfLife {
         }
     }
 
-    pub fn randomize(&mut self, w: Option<usize>, h: Option<usize>) {
-        let mut rng = rand::rng();
-
-        let width = w.unwrap_or(30);
-        let height = h.unwrap_or(30);
-
-        for i in 0..height {
-            for j in 0..width {
-                if rng.random::<f64>() < 0.2 {
-                    self.alive_cells
-                        .insert((i.try_into().unwrap(), j.try_into().unwrap()));
-                }
-            }
-        }
-    }
-
     pub fn randomize_area(&mut self, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
         let mut rng = rand::rng();
 
@@ -115,7 +99,8 @@ impl GameOfLife {
         ]
     }
 
-    // Convert data into a readble output
+    /// Convert data into a readable output
+    /// Used only for testing/debug
     pub fn data_as_str(
         &self,
         mut min_x: i32,
@@ -160,6 +145,7 @@ impl GameOfLife {
         data_as_str
     }
 
+    /// get a new hashset with the alive cell in a certain area
     pub fn data_as_vec(&self, area: (i32, i32, i32, i32)) -> HashSet<(i32, i32)> {
         let (mut min_x, mut min_y, mut max_x, mut max_y) = area;
         if min_x > max_x {
