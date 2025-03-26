@@ -18,6 +18,19 @@ My implementation of Conway's game of life.
 
 It's built using Rust with the crate macroquad and uses Make to run
 
+## Usage
+
+To run it use
+```shell
+make
+```
+
+and to test it use
+```shell
+make test
+```
+
+
 ## Controls
 - Arrows movement
 - O zoom out
