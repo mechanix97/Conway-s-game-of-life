@@ -41,3 +41,12 @@ make test
 - T randomize
 - Left click add/remove a cell
 - Right click add/remove multiple cells while pressed
+
+
+## Decisions on the implementation
+
+I did a separate thread for the simulation so i can catch the key strokes on the main loop and rapidly update the screen. Using this technique, the game looks smoother and responsive.
+
+In order to prevent the program from quitting when the windows is closed, i had to use the macroquad fn 'prevent_quit' and periodically check if the screen was closed using 'is_quit_requested'. 
+
+I used atomics booleans to inform changes in the game states between the simulation and the UI. This include if the game is paused or if the game is still running.
