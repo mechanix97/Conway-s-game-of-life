@@ -31,13 +31,15 @@ impl GameOfLife {
         self.alive_cells.insert((pos_x, pos_y));
     }
 
-
     pub fn change_cell_status(&mut self, pos_x: i32, pos_y: i32) {
-        match self.alive_cells.contains(&(pos_x, pos_y)){
-            true => { self.alive_cells.remove(&(pos_x,pos_y));},
-            false =>{ self.alive_cells.insert((pos_x, pos_y));}
+        match self.alive_cells.contains(&(pos_x, pos_y)) {
+            true => {
+                self.alive_cells.remove(&(pos_x, pos_y));
+            }
+            false => {
+                self.alive_cells.insert((pos_x, pos_y));
+            }
         }
-        
     }
     pub fn step(&mut self) {
         self.step += 1;
@@ -159,20 +161,16 @@ impl GameOfLife {
             max_y = aux;
         }
 
-        let mut output = HashSet::new();
-        // Filter only the cell in the region to draw
-        for (x, y) in self
-            .alive_cells
-            .iter()
-            .filter(|(a, b)| *a >= min_x && *a <= max_x && *b >= min_y && *b <= max_y)
-        {
-            output.insert((*x, *y));
-        }
 
-        output
+        // Filter only the cell in the region to draw
+        self.alive_cells
+            .iter()
+            .filter(|&&(a, b)| a >= min_x && a <= max_x && b >= min_y && b <= max_y)
+            .cloned()
+            .collect()
     }
 
-    pub fn clear_cells(&mut self){
+    pub fn clear_cells(&mut self) {
         self.alive_cells.clear();
         self.step = 0;
     }

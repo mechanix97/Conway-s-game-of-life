@@ -18,7 +18,7 @@ pub struct Screen {
     cols: i32,
     rows: i32,
     cell_width: f32,
-    cell_heigth: f32
+    cell_heigth: f32,
 }
 
 impl Screen {
@@ -34,7 +34,7 @@ impl Screen {
             cols: 0,
             rows: 0,
             cell_width: 0.0,
-            cell_heigth: 0.0
+            cell_heigth: 0.0,
         }
     }
 
@@ -47,7 +47,7 @@ impl Screen {
         }
 
         self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
-        self.cell_width = screen_width() / (self.cols as f32); 
+        self.cell_width = screen_width() / (self.cols as f32);
 
         // draw the cells
         for cell in &gol_data {
@@ -69,14 +69,14 @@ impl Screen {
 
         // draw the mouse hover
         // if the position has a cell, change the colors
-        if let Some(mouse_poition) = self.get_mouse_position(){
+        if let Some(mouse_poition) = self.get_mouse_position() {
             let px = mouse_poition.0 as i32 + self.posx_min as i32 + 1;
             let py = self.posy_max as i32 - mouse_poition.1 as i32;
-            let (color1,color2) = match gol_data.contains(&(px, py)) {
+            let (color1, color2) = match gol_data.contains(&(px, py)) {
                 true => (GRAY, BLACK),
-                false => (BLACK, WHITE)
+                false => (BLACK, WHITE),
             };
-            
+
             draw_rectangle(
                 (mouse_poition.0 as f32) * self.cell_width,
                 (mouse_poition.1 as f32) * self.cell_heigth,
@@ -99,34 +99,39 @@ impl Screen {
         next_frame().await
     }
 
-    pub fn draw_pause_icon(&self){
+    pub fn draw_pause_icon(&self) {
         draw_rectangle(20.0, 20.0, 10.0, 30.0, RED);
         draw_rectangle(40.0, 20.0, 10.0, 30.0, RED);
     }
 
     /// get the cell position if the mouse is on the screen
-    pub fn get_mouse_position(&self) -> Option<(u32,u32)>{
+    pub fn get_mouse_position(&self) -> Option<(u32, u32)> {
         let mouse_position = mouse_position();
 
         match mouse_position {
-            mouse_position if (
-                mouse_position.0 > 0.0 &&
-                mouse_position.1 > 0.0 &&
-                mouse_position.0 < screen_width() &&
-                mouse_position.1 < screen_height() - FOOTER_HEIGHT
-            ) => {
+            mouse_position
+                if (mouse_position.0 > 0.0
+                    && mouse_position.1 > 0.0
+                    && mouse_position.0 < screen_width()
+                    && mouse_position.1 < screen_height() - FOOTER_HEIGHT) =>
+            {
                 Some((
                     (mouse_position.0 / self.cell_width) as u32,
-                    (mouse_position.1 / self.cell_heigth) as u32
+                    (mouse_position.1 / self.cell_heigth) as u32,
                 ))
             }
-            _ => None
-
+            _ => None,
         }
     }
 
     pub fn draw_footer(&self, step: u32, cells_alive: u32) {
-        draw_rectangle(0.0, screen_height() - FOOTER_HEIGHT, screen_width(), FOOTER_HEIGHT, GRAY);
+        draw_rectangle(
+            0.0,
+            screen_height() - FOOTER_HEIGHT,
+            screen_width(),
+            FOOTER_HEIGHT,
+            GRAY,
+        );
         let posx_mid = (self.posx_max + self.posx_min) / 2;
         let posy_mid = (self.posy_max + self.posy_min) / 2;
 
@@ -149,19 +154,16 @@ impl Screen {
     }
 
     /// get the grid position of the mouse
-    pub fn mouse_clicked_pos(&mut self) -> Option<(i32,i32)>{
-        if is_mouse_button_pressed(MouseButton::Left) ||
-        is_mouse_button_down(MouseButton::Right){
+    pub fn mouse_clicked_pos(&mut self) -> Option<(i32, i32)> {
+        if is_mouse_button_pressed(MouseButton::Left) || is_mouse_button_down(MouseButton::Right) {
             return match self.get_mouse_position() {
-                Some(pos) =>{
-                    Some((
-                        pos.0 as i32 + self.posx_min as i32 + 1,
-                        self.posy_max as i32 - pos.1 as i32
-                    )) 
-                },
-                None => None
-            }
-        } 
+                Some(pos) => Some((
+                    pos.0 as i32 + self.posx_min as i32 + 1,
+                    self.posy_max as i32 - pos.1 as i32,
+                )),
+                None => None,
+            };
+        }
         None
     }
 
@@ -177,12 +179,12 @@ impl Screen {
             true => ((self.posy_max - self.posy_min).abs() as f32 * MOVEMENT_RATE) as i32,
             false => ((self.posy_max - self.posy_min) as f32 * MOVEMENT_RATE) as i32,
         };
-        
+
         let mut mov_x = match self.posx_max < 0 {
             true => ((self.posx_max - self.posx_min).abs() as f32 * MOVEMENT_RATE) as i32,
             false => ((self.posx_max - self.posx_min) as f32 * MOVEMENT_RATE) as i32,
         };
-        
+
         // set a minimal value
         if mov_x == 0 {
             mov_x = 1;
@@ -190,7 +192,7 @@ impl Screen {
         if mov_y == 0 {
             mov_y = 1;
         }
-        
+
         let mut refresh = false;
 
         if is_key_down(KeyCode::Down) {
@@ -218,40 +220,41 @@ impl Screen {
             self.posy_min -= mov_y;
             self.posx_max += mov_x;
             self.posx_min -= mov_x;
-        } else if is_key_down(KeyCode::I) { //zoom in
+        } else if is_key_down(KeyCode::I) {
+            //zoom in
             refresh = true;
-        
+
             let center_x = (self.posx_max + self.posx_min) / 2;
             let center_y = (self.posy_max + self.posy_min) / 2;
-        
+
             if self.posy_max - self.posy_min > mov_y {
                 self.posy_max -= mov_y;
                 self.posy_min += mov_y;
             }
-        
+
             if self.posx_max - self.posx_min > mov_x {
                 self.posx_max -= mov_x;
                 self.posx_min += mov_x;
             }
-        
+
             let new_center_x = (self.posx_max + self.posx_min) / 2;
             let new_center_y = (self.posy_max + self.posy_min) / 2;
-        
+
             self.posx_max += (center_x - new_center_x) as i32;
             self.posx_min += (center_x - new_center_x) as i32;
             self.posy_max += (center_y - new_center_y) as i32;
             self.posy_min += (center_y - new_center_y) as i32;
         }
-        if is_key_pressed(KeyCode::P){
+        if is_key_pressed(KeyCode::P) {
             self.paused = !self.paused;
         }
-        if is_key_pressed(KeyCode::R){
+        if is_key_pressed(KeyCode::R) {
             self.reset = true;
         }
-        if is_key_pressed(KeyCode::T){
+        if is_key_pressed(KeyCode::T) {
             self.randomize = true;
         }
-        if is_key_pressed(KeyCode::C){
+        if is_key_pressed(KeyCode::C) {
             refresh = true;
             self.posx_min = -20;
             self.posy_min = -20;
@@ -260,17 +263,17 @@ impl Screen {
         }
         if refresh {
             self.rows = match self.posy_max < 0 {
-                true => (self.posy_max - self.posy_min).abs()  as i32,
+                true => (self.posy_max - self.posy_min).abs() as i32,
                 false => (self.posy_max - self.posy_min) as i32,
             };
 
             self.cols = match self.posx_max < 0 {
-                true => (self.posx_max - self.posx_min).abs()as i32,
+                true => (self.posx_max - self.posx_min).abs() as i32,
                 false => (self.posx_max - self.posx_min) as i32,
             };
-    
+
             self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
-            self.cell_width = screen_width() / (self.cols as f32);    
+            self.cell_width = screen_width() / (self.cols as f32);
         }
     }
 
@@ -282,17 +285,17 @@ impl Screen {
         self.posy_max = d;
 
         self.rows = match self.posy_max < 0 {
-            true => (self.posy_max - self.posy_min).abs()  as i32,
+            true => (self.posy_max - self.posy_min).abs() as i32,
             false => (self.posy_max - self.posy_min) as i32,
         };
 
         self.cols = match self.posx_max < 0 {
-            true => (self.posx_max - self.posx_min).abs()as i32,
+            true => (self.posx_max - self.posx_min).abs() as i32,
             false => (self.posx_max - self.posx_min) as i32,
         };
 
         self.cell_heigth = (screen_height() - FOOTER_HEIGHT) / (self.rows as f32);
-        self.cell_width = screen_width() / (self.cols as f32); 
+        self.cell_width = screen_width() / (self.cols as f32);
     }
 
     pub fn get_area(&self) -> (i32, i32, i32, i32) {
@@ -307,7 +310,7 @@ impl Screen {
         self.reset
     }
 
-    pub fn set_reset(&mut self, r: bool){
+    pub fn set_reset(&mut self, r: bool) {
         self.reset = r;
     }
 
@@ -315,8 +318,7 @@ impl Screen {
         self.randomize
     }
 
-    pub fn set_random(&mut self, r: bool){
+    pub fn set_random(&mut self, r: bool) {
         self.randomize = r;
     }
-    
 }
