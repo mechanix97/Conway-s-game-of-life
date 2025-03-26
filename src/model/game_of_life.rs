@@ -2,6 +2,8 @@ use rand::Rng;
 use std::collections::HashSet;
 use std::fmt;
 
+/// alive_cells contains the position of the alive cells
+/// step count the steps made in the simulation
 pub struct GameOfLife {
     alive_cells: HashSet<(i32, i32)>,
     step: u32,
@@ -15,6 +17,9 @@ impl GameOfLife {
         }
     }
 
+    /// randomize an area going from (min_x, min_y) to (max_x, max_y)
+    /// min_x < max_x
+    /// min_y < max_y
     pub fn randomize_area(&mut self, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
         let mut rng = rand::rng();
 
@@ -27,10 +32,8 @@ impl GameOfLife {
         }
     }
 
-    pub fn add_alive_cell(&mut self, pos_x: i32, pos_y: i32) {
-        self.alive_cells.insert((pos_x, pos_y));
-    }
-
+    /// change the cell status from dead to alive or viceversa
+    /// in a given position
     pub fn change_cell_status(&mut self, pos_x: i32, pos_y: i32) {
         match self.alive_cells.contains(&(pos_x, pos_y)) {
             true => {
@@ -41,6 +44,10 @@ impl GameOfLife {
             }
         }
     }
+
+    /// do a step in the simulation
+    /// it calculates the next position of the cells
+    /// following the 4 main rules 
     pub fn step(&mut self) {
         self.step += 1;
 
@@ -65,6 +72,7 @@ impl GameOfLife {
         self.alive_cells = new_alive_cells;
     }
 
+    /// count the number of alive neighbours around a given cell position
     pub fn count_alive_neighbours(&self, pos_x: i32, pos_y: i32) -> u32 {
         let mut count = 0;
         for i in [-1, 0, 1] {
@@ -170,6 +178,7 @@ impl GameOfLife {
             .collect()
     }
 
+    /// delete all alive cells and restart the step counter
     pub fn clear_cells(&mut self) {
         self.alive_cells.clear();
         self.step = 0;
@@ -196,31 +205,31 @@ mod test {
     fn check_count_alive_neighbours() {
         let mut gol = GameOfLife::new();
         assert_eq!(gol.count_alive_neighbours(0, 0), 0);
-        gol.add_alive_cell(0, 0);
+        gol.change_cell_status(0, 0);
         assert_eq!(gol.count_alive_neighbours(0, 0), 0);
-        gol.add_alive_cell(1, 0);
+        gol.change_cell_status(1, 0);
         assert_eq!(gol.count_alive_neighbours(0, 0), 1);
-        gol.add_alive_cell(2, 0);
+        gol.change_cell_status(2, 0);
         assert_eq!(gol.count_alive_neighbours(0, 0), 1);
-        gol.add_alive_cell(1, 1);
-        gol.add_alive_cell(0, 1);
-        gol.add_alive_cell(-1, 1);
-        gol.add_alive_cell(-1, 0);
-        gol.add_alive_cell(-1, -1);
-        gol.add_alive_cell(0, -1);
-        gol.add_alive_cell(1, -1);
+        gol.change_cell_status(1, 1);
+        gol.change_cell_status(0, 1);
+        gol.change_cell_status(-1, 1);
+        gol.change_cell_status(-1, 0);
+        gol.change_cell_status(-1, -1);
+        gol.change_cell_status(0, -1);
+        gol.change_cell_status(1, -1);
         assert_eq!(gol.count_alive_neighbours(0, 0), 8);
     }
 
     #[test]
     fn test_rule1() {
         let mut gol = GameOfLife::new();
-        gol.add_alive_cell(0, 0);
+        gol.change_cell_status(0, 0);
         assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬜⬛\n⬛⬛⬛\n");
         gol.step();
         assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬛⬛\n⬛⬛⬛\n");
-        gol.add_alive_cell(0, 0);
-        gol.add_alive_cell(0, 1);
+        gol.change_cell_status(0, 0);
+        gol.change_cell_status(0, 1);
         assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬜⬜\n⬛⬛⬛\n");
         gol.step();
         assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬛⬛⬛\n⬛⬛⬛\n");
@@ -230,9 +239,9 @@ mod test {
     fn test_rule2() {
         let mut gol = GameOfLife::new();
 
-        gol.add_alive_cell(0, 0);
-        gol.add_alive_cell(0, 1);
-        gol.add_alive_cell(0, -1);
+        gol.change_cell_status(0, 0);
+        gol.change_cell_status(0, 1);
+        gol.change_cell_status(0, -1);
 
         assert_eq!(gol.data_as_str(-1, 1, -1, 1), "⬛⬛⬛\n⬜⬜⬜\n⬛⬛⬛\n");
 
@@ -244,11 +253,11 @@ mod test {
     #[test]
     fn test_rule3() {
         let mut gol = GameOfLife::new();
-        gol.add_alive_cell(2, 2);
-        gol.add_alive_cell(1, 2);
-        gol.add_alive_cell(2, 1);
-        gol.add_alive_cell(3, 2);
-        gol.add_alive_cell(2, 3);
+        gol.change_cell_status(2, 2);
+        gol.change_cell_status(1, 2);
+        gol.change_cell_status(2, 1);
+        gol.change_cell_status(3, 2);
+        gol.change_cell_status(2, 3);
         assert_eq!(gol.data_as_str(1, 3, 1, 3), "⬛⬜⬛\n⬜⬜⬜\n⬛⬜⬛\n");
 
         gol.step();
@@ -259,9 +268,9 @@ mod test {
     #[test]
     fn test_rule4() {
         let mut gol = GameOfLife::new();
-        gol.add_alive_cell(1, 1);
-        gol.add_alive_cell(1, 2);
-        gol.add_alive_cell(2, 1);
+        gol.change_cell_status(1, 1);
+        gol.change_cell_status(1, 2);
+        gol.change_cell_status(2, 1);
 
         assert_eq!(gol.data_as_str(1, 2, 1, 2), "⬜⬛\n⬜⬜\n");
 
